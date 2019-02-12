@@ -1,6 +1,6 @@
 <?php
 
-namespace app\models;
+namespace app\models\search;
 
 use Yii;
 use yii\base\Model;
@@ -11,7 +11,7 @@ use yii\httpclient\Client;
 /**
  * Class QuandiSearch
  *
- * @package app\models
+ * @package app\models\search
  */
 class QuandiSearch extends Model
 {
@@ -76,9 +76,20 @@ class QuandiSearch extends Model
             return $dataProvider;
         }
 
-        $requestData = $this->sendRequest();
-        $this->fields = ArrayHelper::getValue($requestData, 'dataset.column_names');
-        $data = ArrayHelper::getValue($requestData, 'dataset.data', []);
+        $response = $this->sendRequest();
+
+        if (!$response) {
+            return $dataProvider;
+        }
+
+        $this->fields = ArrayHelper::getValue($response, 'dataset.column_names');
+        $data = ArrayHelper::getValue($response, 'dataset.data', []);
+
+        if (empty($this->fields)) {
+            $error = ArrayHelper::getValue($response, 'quandl_error.message');
+
+            Yii::$app->session->setFlash('error', $error);
+        }
 
         return $this->dataProvider($data);
     }
@@ -174,9 +185,10 @@ class QuandiSearch extends Model
                 ->setUrl($this->getPreparedUrl())
                 ->send();
         } catch (\yii\httpclient\Exception $e) {
-            Yii::error($e->getMessage());
+            $errorMessage = $e->getMessage();
+            Yii::error($errorMessage);
 
-            Yii::$app->session->setFlash('success', Yii::t('common', $e->getMessage()));
+            Yii::$app->session->setFlash('error', $errorMessage);
 
             return false;
         }

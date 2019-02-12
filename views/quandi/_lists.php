@@ -1,6 +1,6 @@
 <?php
 
-use app\models\QuandiSearch;
+use app\models\search\QuandiSearch;
 use yii\data\ArrayDataProvider;
 use yii\grid\GridView;
 

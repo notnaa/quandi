@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\QuandiSearch;
+use app\models\search\QuandiSearch;
 use yii\web\Controller;
 
 /**
