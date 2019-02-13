@@ -4,6 +4,7 @@ use app\models\search\QuandiSearch;
 use yii\data\ArrayDataProvider;
 use yii\helpers\Html;
 use yii\web\View;
+use yii\widgets\Pjax;
 
 /**
  * @var View $this
@@ -18,6 +19,8 @@ $this->title = 'Quandi form';
     <?= Html::encode($this->title); ?>
 </h1>
 
+<?php Pjax::begin(); ?>
+
 <?= $this->render('_filter', [
     'searchModel' => $searchModel,
 ]); ?>
@@ -29,3 +32,5 @@ $this->title = 'Quandi form';
     'searchModel' => $searchModel,
     'dataProvider' => $dataProvider,
 ]); ?>
+
+<?php Pjax::end(); ?>

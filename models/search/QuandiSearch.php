@@ -178,12 +178,23 @@ class QuandiSearch extends Model
      */
     private function sendRequest()
     {
+        $url = $this->getPreparedUrl();
+        $cacheResponse = Yii::$app->cache->get($url);
+
+        if ($cacheResponse) {
+            return $cacheResponse;
+        }
+
         try {
             $client = new Client(['transport' => 'yii\httpclient\CurlTransport']);
             $request = $client->createRequest()
                 ->setMethod('get')
-                ->setUrl($this->getPreparedUrl())
+                ->setUrl($url)
                 ->send();
+
+            $data = $request->getData();
+
+            Yii::$app->cache->add($url, $data, 60);
         } catch (\yii\httpclient\Exception $e) {
             $errorMessage = $e->getMessage();
             Yii::error($errorMessage);
@@ -193,7 +204,7 @@ class QuandiSearch extends Model
             return false;
         }
 
-        return $request->getData();
+        return $data ?? null;
     }
 
     /**
